@@ -1,13 +1,14 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Label, TextInput, Button, Alert, Spinner } from "flowbite-react";
 import { useState } from "react";
+import OAuth from "../components/OAuth";
 
 export default function SignUp() {
   const [formData, setFormData] = useState({});
   const [errorMessage, setErrorMessage] = useState(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value.trim() });
   };
@@ -30,11 +31,11 @@ export default function SignUp() {
       }
       setLoading(false);
       if (res.ok) {
-        navigate('/sign-in');
+        navigate("/sign-in");
       }
     } catch (error) {
-      setErrorMessage(error.message)
-      setLoading(false)
+      setErrorMessage(error.message);
+      setLoading(false);
     }
   };
   return (
@@ -44,7 +45,7 @@ export default function SignUp() {
         <div className="flex-1">
           <Link to="/" className="font-bold dark:text-white text-4xl">
             <span className="px-2 py-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-lg text-white">
-              Sahad's
+              Sahand's
             </span>
             Blog
           </Link>
@@ -83,16 +84,21 @@ export default function SignUp() {
                 onChange={handleChange}
               />
             </div>
-            <Button gradientDuoTone="purpleToPink" type="submit" disabled={loading}>
+            <Button
+              gradientDuoTone="purpleToPink"
+              type="submit"
+              disabled={loading}
+            >
               {loading ? (
                 <>
-                  <Spinner size='sm' />
+                  <Spinner size="sm" />
                   <span className="pl-3">Loading</span>
                 </>
               ) : (
-                'Sign Up'
+                "Sign Up"
               )}
             </Button>
+            <OAuth />
           </form>
           <div className="flex gap-2 text-sm mt-5">
             <span>Have an account?</span>
