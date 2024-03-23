@@ -1,10 +1,11 @@
 import { errorHandler } from "../utils/error.js";
 import Post from "../models/post.model.js";
+import Comment from "../models/comment.model.js";
 
 export const create = async (req, res, next) => {
-  if (!req.user.isAdmin) {
-    return next(errorHandler(403, "You are not allowed to create a post"));
-  }
+  // if (!req.user.isAdmin) {
+  //   return next(errorHandler(403, "You are not allowed to create a post"));
+  // }
   if (!req.body.title || !req.body.content) {
     return next(errorHandler(400, "Please provide all required fileds"));
   }
@@ -72,19 +73,32 @@ export const getposts = async (req, res, next) => {
 };
 
 export const deletepost = async (req, res, next) => {
-  if (!req.user.isAdmin || req.user.id !== req.params.userId) {
+  if (!req.user.isAdmin && req.user.id !== req.params.userId) {
     return next(errorHandler(403, "You are not allowed to delete this post"));
   }
   try {
+    // First, find the post to be deleted
+    const deletedPost = await Post.findById(req.params.postId);
+
+    // Check if the post exists
+    if (!deletedPost) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+
+    // Delete associated comments
+    await Comment.deleteMany({ postId: req.params.postId });
+
+    // Then delete the post
     await Post.findByIdAndDelete(req.params.postId);
-    res.status(200).json("The post has been deleted");
+
+    res.status(200).json("The post and associated comments have been deleted");
   } catch (error) {
     next(error);
   }
 };
 
 export const updatepost = async (req, res, next) => {
-  if (!req.user.isAdmin || req.user.id !== req.params.userId) {
+  if (!req.user.isAdmin && req.user.id !== req.params.userId) {
     return next(errorHandler(403, "You are not allowed to update this post"));
   }
   try {
