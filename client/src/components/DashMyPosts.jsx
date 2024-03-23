@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { Table } from "flowbite-react";
+import { Table, Select } from "flowbite-react";
 import { Link } from "react-router-dom";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
 import { Button, Modal } from "flowbite-react";
@@ -11,6 +11,7 @@ export default function DashPosts() {
   const [showMore, setShowMore] = useState(true);
   const [showModel, setShowModel] = useState(false);
   const [postIdToDelete, setPostIdToDelete] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -71,25 +72,48 @@ export default function DashPosts() {
       console.log(error.message);
     }
   };
+  const handleStatusFilterChange = (value) => {
+    setStatusFilter(value);
+  };
+
+  // Filter posts based on status
+  const filteredPosts =
+    statusFilter === "all"
+      ? userPosts
+      : userPosts.filter((post) => post.postStatus === statusFilter);
+
   return (
     <div className="table-auto overflow-x-scroll md:mx-auto p-3 scrollbar scrollbar-track-slate-100 scrollbar-thumb-slate-300 dark:scrollbar-track-slate-700 dark:scrollbar-thumb-slate-500">
-      <h1 className="my-7 text-center font-semibold text-3xl uppercase">
-        Your Posts
-      </h1>
-      {currentUser && userPosts.length > 0 ? (
+      {currentUser && filteredPosts.length > 0 ? (
         <>
+          <h1 className="my-7 text-center font-semibold text-3xl uppercase">
+            Your Posts
+          </h1>
+          <div className="flex justify-end">
+            <Select
+              value={statusFilter}
+              onChange={(e) => handleStatusFilterChange(e.target.value)}
+              className="p-3"
+            >
+              <option value="all">All</option>
+              <option value="pending">pending</option>
+              <option value="accepted">accepted</option>
+              <option value="rejected">rejected</option>
+            </Select>
+          </div>
           <Table hoverable className="shadow-md">
             <Table.Head>
               <Table.HeadCell>Date updated</Table.HeadCell>
               <Table.HeadCell>Post image</Table.HeadCell>
               <Table.HeadCell>Post title</Table.HeadCell>
+              <Table.HeadCell>Post status</Table.HeadCell>
               <Table.HeadCell>category</Table.HeadCell>
               <Table.HeadCell>Delete</Table.HeadCell>
               <Table.HeadCell>
                 <span>Edit</span>
               </Table.HeadCell>
             </Table.Head>
-            {userPosts.map((post) => (
+            {filteredPosts.map((post) => (
               <Table.Body className="divide-y" key={post._id}>
                 <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
                   <Table.Cell>
@@ -112,6 +136,7 @@ export default function DashPosts() {
                       {post.title}
                     </Link>
                   </Table.Cell>
+                  <Table.Cell>{post.postStatus}</Table.Cell>
                   <Table.Cell>{post.category}</Table.Cell>
                   <Table.Cell>
                     <span

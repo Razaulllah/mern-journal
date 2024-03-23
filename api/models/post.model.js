@@ -29,6 +29,10 @@ const postSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
+    postStatus: {
+      type: String,
+      default: "pending", // default status is "pending"
+    },
   },
   { timestamps: true }
 );
