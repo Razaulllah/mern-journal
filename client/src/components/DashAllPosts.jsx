@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
 import { Button, Modal } from "flowbite-react";
 
-export default function DashPosts() {
+export default function DashAllPosts() {
   const { currentUser } = useSelector((state) => state.user);
   const [userPosts, setUserPosts] = useState([]);
   const [showMore, setShowMore] = useState(true);
@@ -15,10 +15,20 @@ export default function DashPosts() {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const res = await fetch(`/api/post/getposts?userId=${currentUser._id}`);
+        const res = await fetch("/api/post/getposts");
         const data = await res.json();
         if (res.ok) {
-          setUserPosts(data.posts);
+          const postsWithUserInfo = await Promise.all(
+            data.posts.map(async (post) => {
+              const userRes = await fetch(`/api/user/${post.userId}`);
+              const userData = await userRes.json();
+              return {
+                ...post,
+                username: userData.username,
+              };
+            })
+          );
+          setUserPosts(postsWithUserInfo);
           if (data.posts.length < 9) {
             setShowMore(false);
           }
@@ -27,20 +37,26 @@ export default function DashPosts() {
         console.log(error.message);
       }
     };
-    if (currentUser.isAdmin) {
-      fetchPosts();
-    }
-  }, [currentUser._id]);
+    fetchPosts();
+  }, []);
 
   const handleShowMore = async () => {
     const startIndex = userPosts.length;
     try {
-      const res = await fetch(
-        `/api/post/getposts?userId?${currentUser._id}&startIndex=${startIndex}`
-      );
+      const res = await fetch(`/api/post/getposts?startIndex=${startIndex}`);
       const data = await res.json();
       if (res.ok) {
-        setUserPosts((prev) => [...prev, ...data.posts]);
+        const postsWithUserInfo = await Promise.all(
+          data.posts.map(async (post) => {
+            const userRes = await fetch(`/api/user/${post.userId}`);
+            const userData = await userRes.json();
+            return {
+              ...post,
+              username: userData.username,
+            };
+          })
+        );
+        setUserPosts((prev) => [...prev, ...postsWithUserInfo]);
         if (data.posts.length < 9) {
           setShowMore(false);
         }
@@ -73,13 +89,17 @@ export default function DashPosts() {
   };
   return (
     <div className="table-auto overflow-x-scroll md:mx-auto p-3 scrollbar scrollbar-track-slate-100 scrollbar-thumb-slate-300 dark:scrollbar-track-slate-700 dark:scrollbar-thumb-slate-500">
-      {currentUser.isAdmin && userPosts.length > 0 ? (
+      <h1 className="my-7 text-center font-semibold text-3xl uppercase">
+        All Users Posts
+      </h1>
+      {currentUser && userPosts.length > 0 ? (
         <>
           <Table hoverable className="shadow-md">
             <Table.Head>
               <Table.HeadCell>Date updated</Table.HeadCell>
               <Table.HeadCell>Post image</Table.HeadCell>
               <Table.HeadCell>Post title</Table.HeadCell>
+              <Table.HeadCell>Uploaded By</Table.HeadCell>
               <Table.HeadCell>category</Table.HeadCell>
               <Table.HeadCell>Delete</Table.HeadCell>
               <Table.HeadCell>
@@ -101,14 +121,15 @@ export default function DashPosts() {
                       />
                     </Link>
                   </Table.Cell>
-                  <Table.Cell>
+                  <Table.Cell className="w-40">
                     <Link
-                      className="font-medium text-gray-900 dark:text-white"
+                      className="line-clamp-2 font-medium text-gray-900 dark:text-white"
                       to={`/post/${post.slug}`}
                     >
                       {post.title}
                     </Link>
                   </Table.Cell>
+                  <Table.Cell>{post.username}</Table.Cell>
                   <Table.Cell>{post.category}</Table.Cell>
                   <Table.Cell>
                     <span

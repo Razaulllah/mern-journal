@@ -72,7 +72,13 @@ export default function Search() {
     const urlParams = new URLSearchParams(location.search);
     urlParams.set("searchTerm", sidebarData.searchTerm);
     urlParams.set("sort", sidebarData.sort || "desc");
-    urlParams.set("category", sidebarData.category || "uncategorized");
+
+    if (sidebarData.category && sidebarData.category !== "uncategorized") {
+      urlParams.set("category", sidebarData.category);
+    } else {
+      urlParams.delete("category");
+    }
+
     const searchQuery = urlParams.toString();
     navigate(`/search?${searchQuery}`);
   };

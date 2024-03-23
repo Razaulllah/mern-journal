@@ -7,6 +7,7 @@ import {
   HiAnnotation,
   HiChartPie,
 } from "react-icons/hi";
+import { IoDocumentsSharp } from "react-icons/io5";
 import { useEffect, useState } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { signoutSuccess } from "../redux/user/userSlice";
@@ -65,15 +66,26 @@ export default function DashSidebar() {
               Profile
             </Sidebar.Item>
           </Link>
+          {currentUser && (
+            <Link to="/dashboard?tab=myposts">
+              <Sidebar.Item
+                active={tab === "myposts"}
+                icon={HiDocumentText}
+                as="div"
+              >
+                My Posts
+              </Sidebar.Item>
+            </Link>
+          )}
           {currentUser.isAdmin && (
             <>
-              <Link to="/dashboard?tab=posts">
+              <Link to="/dashboard?tab=allposts">
                 <Sidebar.Item
-                  active={tab === "posts"}
-                  icon={HiDocumentText}
+                  active={tab === "allposts"}
+                  icon={IoDocumentsSharp}
                   as="div"
                 >
-                  Posts
+                  All Posts
                 </Sidebar.Item>
               </Link>
               <Link to="/dashboard?tab=users">
