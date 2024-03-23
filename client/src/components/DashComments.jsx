@@ -17,7 +17,24 @@ export default function DashComments() {
         const res = await fetch(`/api/comment/getcomments`);
         const data = await res.json();
         if (res.ok) {
-          setComments(data.comments);
+          const commentsWithInfo = await Promise.all(
+            data.comments.map(async (comment) => {
+              // Fetch user information for each comment
+              const userRes = await fetch(`/api/user/${comment.userId}`);
+              const userData = await userRes.json();
+
+              // Fetch post information for each comment
+              const postRes = await fetch(`/api/post/${comment.postId}`);
+              const postData = await postRes.json();
+
+              return {
+                ...comment,
+                username: userData.username,
+                postTitle: postData.title,
+              };
+            })
+          );
+          setComments(commentsWithInfo);
           if (data.comments.length < 9) {
             setShowMore(false);
           }
@@ -39,7 +56,22 @@ export default function DashComments() {
       );
       const data = await res.json();
       if (res.ok) {
-        setComments((prev) => [...prev, ...data.comments]);
+        const commentsWithInfo = await Promise.all(
+          data.comments.map(async (comment) => {
+            const userRes = await fetch(`/api/user/${comment.userId}`);
+            const userData = await userRes.json();
+
+            const postRes = await fetch(`/api/post/${comment.postId}`);
+            const postData = await postRes.json();
+
+            return {
+              ...comment,
+              username: userData.username,
+              postTitle: postData.title,
+            };
+          })
+        );
+        setComments((prev) => [...prev, ...commentsWithInfo]);
         if (data.comments.length < 9) {
           setShowMore(false);
         }
@@ -48,6 +80,7 @@ export default function DashComments() {
       console.log(error.message);
     }
   };
+
   const handleDeleteComment = async () => {
     setShowModel(false);
     try {
@@ -79,8 +112,8 @@ export default function DashComments() {
               <Table.HeadCell>Date updated</Table.HeadCell>
               <Table.HeadCell>comment content</Table.HeadCell>
               <Table.HeadCell>Number of likes</Table.HeadCell>
-              <Table.HeadCell>PostId</Table.HeadCell>
-              <Table.HeadCell>UserId</Table.HeadCell>
+              <Table.HeadCell>Post Title</Table.HeadCell>
+              <Table.HeadCell>Username</Table.HeadCell>
               <Table.HeadCell>Delete</Table.HeadCell>
             </Table.Head>
             {comments.map((comment) => (
@@ -93,8 +126,10 @@ export default function DashComments() {
                     <p className="line-clamp-2">{comment.content}</p>
                   </Table.Cell>
                   <Table.Cell>{comment.numberOfLikes}</Table.Cell>
-                  <Table.Cell>{comment.postId}</Table.Cell>
-                  <Table.Cell>{comment.userId}</Table.Cell>
+                  <Table.Cell className="w-80">
+                    <p className="line-clamp-2">{comment.postTitle}</p>
+                  </Table.Cell>
+                  <Table.Cell>{comment.username}</Table.Cell>
                   <Table.Cell>
                     <span
                       onClick={() => {
