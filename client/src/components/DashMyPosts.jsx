@@ -84,23 +84,23 @@ export default function DashPosts() {
 
   return (
     <div className="table-auto overflow-x-scroll md:mx-auto p-3 scrollbar scrollbar-track-slate-100 scrollbar-thumb-slate-300 dark:scrollbar-track-slate-700 dark:scrollbar-thumb-slate-500">
+      <h1 className="my-7 text-center font-semibold text-3xl uppercase">
+        Your Posts
+      </h1>
+      <div className="flex justify-end">
+        <Select
+          value={statusFilter}
+          onChange={(e) => handleStatusFilterChange(e.target.value)}
+          className="p-3"
+        >
+          <option value="all">All</option>
+          <option value="pending">Pending</option>
+          <option value="accepted">Accepted</option>
+          <option value="rejected">Rejected</option>
+        </Select>
+      </div>
       {currentUser && filteredPosts.length > 0 ? (
         <>
-          <h1 className="my-7 text-center font-semibold text-3xl uppercase">
-            Your Posts
-          </h1>
-          <div className="flex justify-end">
-            <Select
-              value={statusFilter}
-              onChange={(e) => handleStatusFilterChange(e.target.value)}
-              className="p-3"
-            >
-              <option value="all">All</option>
-              <option value="pending">pending</option>
-              <option value="accepted">accepted</option>
-              <option value="rejected">rejected</option>
-            </Select>
-          </div>
           <Table hoverable className="shadow-md">
             <Table.Head>
               <Table.HeadCell>Date updated</Table.HeadCell>
@@ -136,7 +136,22 @@ export default function DashPosts() {
                       {post.title}
                     </Link>
                   </Table.Cell>
-                  <Table.Cell>{post.postStatus}</Table.Cell>
+                  <Table.Cell>
+                    <span
+                      className={`${
+                        post.postStatus === "accepted"
+                          ? "bg-green-200 text-black"
+                          : post.postStatus === "rejected"
+                          ? "bg-red-200 text-black"
+                          : post.postStatus === "pending"
+                          ? "bg-yellow-200 text-black"
+                          : ""
+                      } inline-block px-2 py-1 rounded-lg`}
+                    >
+                      {post.postStatus}
+                    </span>
+                  </Table.Cell>
+
                   <Table.Cell>{post.category}</Table.Cell>
                   <Table.Cell>
                     <span
@@ -171,7 +186,24 @@ export default function DashPosts() {
           )}
         </>
       ) : (
-        <p>You have no posts yet</p>
+        <>
+          <Table hoverable className="shadow-md">
+            <Table.Head>
+              <Table.HeadCell>Date updated</Table.HeadCell>
+              <Table.HeadCell>Post image</Table.HeadCell>
+              <Table.HeadCell>Post title</Table.HeadCell>
+              <Table.HeadCell>Post status</Table.HeadCell>
+              <Table.HeadCell>category</Table.HeadCell>
+              <Table.HeadCell>Delete</Table.HeadCell>
+              <Table.HeadCell>
+                <span>Edit</span>
+              </Table.HeadCell>
+            </Table.Head>
+          </Table>
+          <h1 className="my-7 text-center font-semibold text-3xl flex justify-center">
+            You have no posts yet
+          </h1>
+        </>
       )}
       <Modal
         show={showModel}

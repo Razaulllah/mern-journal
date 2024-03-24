@@ -40,7 +40,17 @@ export default function DashboardComp() {
         const res = await fetch("/api/post/getposts?limit=5");
         const data = await res.json();
         if (res.ok) {
-          setPosts(data.posts);
+          const postsWithUserInfo = await Promise.all(
+            data.posts.map(async (post) => {
+              const userRes = await fetch(`/api/user/${post.userId}`);
+              const userData = await userRes.json();
+              return {
+                ...post,
+                username: userData.username,
+              };
+            })
+          );
+          setPosts(postsWithUserInfo);
           setTotalPosts(data.totalPosts);
           setLastMonthPosts(data.lastMonthPosts);
         }
@@ -48,12 +58,30 @@ export default function DashboardComp() {
         console.log(error.message);
       }
     };
+
     const fetchComments = async () => {
       try {
-        const res = await fetch("/api/comment/getcomments?limit=5");
+        const res = await fetch(`/api/comment/getcomments`);
         const data = await res.json();
         if (res.ok) {
-          setComments(data.comments);
+          const commentsWithInfo = await Promise.all(
+            data.comments.map(async (comment) => {
+              // Fetch user information for each comment
+              const userRes = await fetch(`/api/user/${comment.userId}`);
+              const userData = await userRes.json();
+
+              // Fetch post information for each comment
+              const postRes = await fetch(`/api/post/${comment.postId}`);
+              const postData = await postRes.json();
+
+              return {
+                ...comment,
+                username: userData.username,
+                postTitle: postData.title,
+              };
+            })
+          );
+          setComments(commentsWithInfo);
           setTotalComments(data.totalComments);
           setLastMonthComments(data.lastMonthComments);
         }
@@ -171,14 +199,20 @@ export default function DashboardComp() {
           <Table hoverable>
             <Table.Head>
               <Table.HeadCell>Comment content</Table.HeadCell>
+              <Table.HeadCell>Username</Table.HeadCell>
+              <Table.HeadCell>Post Title</Table.HeadCell>
               <Table.HeadCell>Likes</Table.HeadCell>
             </Table.Head>
             {comments &&
               comments.map((comment) => (
                 <Table.Body key={comment._id} className="divide-y">
                   <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
-                    <Table.Cell className="w-96">
+                    <Table.Cell className="w-30">
                       <p className="line-clamp-2">{comment.content}</p>
+                    </Table.Cell>
+                    <Table.Cell>{comment.username}</Table.Cell>
+                    <Table.Cell className="w-20">
+                      <p className="line-clamp-2">{comment.postTitle}</p>
                     </Table.Cell>
                     <Table.Cell>{comment.numberOfLikes}</Table.Cell>
                   </Table.Row>
@@ -190,13 +224,14 @@ export default function DashboardComp() {
           <div className="flex justify-between p-3 text-sm font-semibold">
             <h1 className="text-center p-2">Recent posts</h1>
             <Button outline gradientDuoTone="purpleToPink">
-              <Link to={"/dashboard?tab=posts"}>See all</Link>
+              <Link to={"/dashboard?tab=allposts"}>See all</Link>
             </Button>
           </div>
           <Table hoverable>
             <Table.Head>
               <Table.HeadCell>Post image</Table.HeadCell>
               <Table.HeadCell>Post Title</Table.HeadCell>
+              <Table.HeadCell>Uploaded By</Table.HeadCell>
               <Table.HeadCell>Category</Table.HeadCell>
             </Table.Head>
             {posts &&
@@ -210,7 +245,9 @@ export default function DashboardComp() {
                         className="w-14 h-10 rounded-md bg-gray-500"
                       />
                     </Table.Cell>
-                    <Table.Cell className="w-96">{post.title}</Table.Cell>
+                    <Table.Cell className="w-80">{post.title}</Table.Cell>
+                    {console.log(post.username)}
+                    <Table.Cell className="w-10">{post.username}</Table.Cell>
                     <Table.Cell className="w-5">{post.category}</Table.Cell>
                   </Table.Row>
                 </Table.Body>

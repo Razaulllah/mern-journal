@@ -127,23 +127,23 @@ export default function DashAllPosts() {
 
   return (
     <div className="table-auto overflow-x-scroll md:mx-auto p-3 scrollbar scrollbar-track-slate-100 scrollbar-thumb-slate-300 dark:scrollbar-track-slate-700 dark:scrollbar-thumb-slate-500">
+      <h1 className="my-7 text-center font-semibold text-3xl uppercase">
+        All Users Posts
+      </h1>
+      <div className="flex justify-end">
+        <Select
+          value={statusFilter}
+          onChange={(e) => handleStatusFilterChange(e.target.value)}
+          className="p-3"
+        >
+          <option value="all">All</option>
+          <option value="pending">pending</option>
+          <option value="accepted">accepted</option>
+          <option value="rejected">rejected</option>
+        </Select>
+      </div>
       {currentUser && filteredPosts.length > 0 ? (
         <>
-          <h1 className="my-7 text-center font-semibold text-3xl uppercase">
-            All Users Posts
-          </h1>
-          <div className="flex justify-end">
-            <Select
-              value={statusFilter}
-              onChange={(e) => handleStatusFilterChange(e.target.value)}
-              className="p-3"
-            >
-              <option value="all">All</option>
-              <option value="pending">pending</option>
-              <option value="accepted">accepted</option>
-              <option value="rejected">rejected</option>
-            </Select>
-          </div>
           <Table hoverable className="shadow-md">
             <Table.Head>
               <Table.HeadCell>Date updated</Table.HeadCell>
@@ -227,7 +227,25 @@ export default function DashAllPosts() {
           )}
         </>
       ) : (
-        <p>There have no posts yet</p>
+        <>
+          <Table hoverable className="shadow-md">
+            <Table.Head>
+              <Table.HeadCell>Date updated</Table.HeadCell>
+              <Table.HeadCell>Post image</Table.HeadCell>
+              <Table.HeadCell>Post title</Table.HeadCell>
+              <Table.HeadCell>Uploaded By</Table.HeadCell>
+              <Table.HeadCell>Post status</Table.HeadCell>
+              <Table.HeadCell>category</Table.HeadCell>
+              <Table.HeadCell>Delete</Table.HeadCell>
+              <Table.HeadCell>
+                <span>Edit</span>
+              </Table.HeadCell>
+            </Table.Head>
+          </Table>
+          <h1 className="my-7 text-center font-semibold text-3xl flex justify-center">
+            You have no posts yet
+          </h1>
+        </>
       )}
       <Modal
         show={showModel}

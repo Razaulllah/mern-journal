@@ -34,7 +34,9 @@ export default function Search() {
     const fetchPosts = async () => {
       setLoading(true);
       const searchQuery = urlParams.toString();
-      const res = await fetch(`/api/post/getposts?${searchQuery}`);
+      const res = await fetch(
+        `/api/post/getposts?${searchQuery}&accepted=true`
+      );
       if (!res.ok) {
         setLoading(false);
         return;
