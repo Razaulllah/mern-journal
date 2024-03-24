@@ -180,7 +180,7 @@ export default function DashAllPosts() {
                       {post.title}
                     </Link>
                   </Table.Cell>
-                  <Table.Cell>{post.username}</Table.Cell>
+                  <Table.Cell>{post.username || "Anonymous"}</Table.Cell>
                   <Table.Cell>
                     <Select
                       value={post.postStatus}

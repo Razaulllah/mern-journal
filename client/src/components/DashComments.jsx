@@ -132,7 +132,7 @@ export default function DashComments() {
                   <Table.Cell className="w-80">
                     <p className="line-clamp-2">{comment.postTitle}</p>
                   </Table.Cell>
-                  <Table.Cell>{comment.username}</Table.Cell>
+                  <Table.Cell>{comment.username || "Anonymous"}</Table.Cell>
                   <Table.Cell>
                     <span
                       onClick={() => {

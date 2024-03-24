@@ -7,7 +7,7 @@ export const test = (req, res) => {
 };
 
 export const UpdateUser = async (req, res, next) => {
-  if (req.user.id !== req.params.userId) {
+  if (!req.user.isAdmin && req.user.id !== req.params.userId) {
     return next(errorHandler(403, "You are not allowed to update this user"));
   }
   if (req.body.password) {
@@ -43,6 +43,7 @@ export const UpdateUser = async (req, res, next) => {
           email: req.body.email,
           profilePicture: req.body.profilePicture,
           password: req.body.password,
+          isAdmin: req.body.isAdmin,
         },
       },
       { new: true }

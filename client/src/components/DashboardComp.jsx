@@ -210,7 +210,7 @@ export default function DashboardComp() {
                     <Table.Cell className="w-30">
                       <p className="line-clamp-2">{comment.content}</p>
                     </Table.Cell>
-                    <Table.Cell>{comment.username}</Table.Cell>
+                    <Table.Cell>{comment.username || "Anonymous"}</Table.Cell>
                     <Table.Cell className="w-20">
                       <p className="line-clamp-2">{comment.postTitle}</p>
                     </Table.Cell>
@@ -246,8 +246,10 @@ export default function DashboardComp() {
                       />
                     </Table.Cell>
                     <Table.Cell className="w-80">{post.title}</Table.Cell>
-                    {console.log(post.username)}
-                    <Table.Cell className="w-10">{post.username}</Table.Cell>
+                    {/* {console.log(post.username)} */}
+                    <Table.Cell className="w-10">
+                      {post.username || "Anonymous"}
+                    </Table.Cell>
                     <Table.Cell className="w-5">{post.category}</Table.Cell>
                   </Table.Row>
                 </Table.Body>
