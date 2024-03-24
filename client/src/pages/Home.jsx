@@ -12,7 +12,17 @@ export default function Home() {
         const res = await fetch("/api/post/getPosts?accepted=true");
         const data = await res.json();
         if (res.ok) {
-          setPosts(data.posts);
+          const postsWithUsernames = await Promise.all(
+            data.posts.map(async (post) => {
+              const userRes = await fetch(`/api/user/${post.userId}`);
+              const userData = await userRes.json();
+              return {
+                ...post,
+                username: userData.username,
+              };
+            })
+          );
+          setPosts(postsWithUsernames);
         }
       } catch (error) {
         console.log(error.message);
@@ -43,7 +53,7 @@ export default function Home() {
             <h2 className="text-2xl font-semibold text-center">Recent Posts</h2>
             <div className="flex flex-wrap gap-4">
               {posts.map((post) => (
-                <PostCard key={post._id} post={post} />
+                <PostCard key={post._id} post={post} username={post.userId} />
               ))}
             </div>
             <Link

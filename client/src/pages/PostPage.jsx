@@ -42,7 +42,17 @@ export default function PostPage() {
         const res = await fetch("/api/post/getposts?limit=3&accepted=true");
         const data = await res.json();
         if (res.ok) {
-          setRecentPosts(data.posts);
+          const postsWithUsernames = await Promise.all(
+            data.posts.map(async (post) => {
+              const userRes = await fetch(`/api/user/${post.userId}`);
+              const userData = await userRes.json();
+              return {
+                ...post,
+                username: userData.username,
+              };
+            })
+          );
+          setRecentPosts(postsWithUsernames);
         }
       };
       fetchRecentPosts();
@@ -95,7 +105,9 @@ export default function PostPage() {
         <h1 className="text-xl mt-5">Recent articles</h1>
         <div className="flex flex-wrap gap-5 mt-5 justify-center">
           {recentPosts &&
-            recentPosts.map((post) => <PostCard key={post._id} post={post} />)}
+            recentPosts.map((post) => (
+              <PostCard key={post._id} post={post} username={post.username} />
+            ))}
         </div>
       </div>
     </main>
