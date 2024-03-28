@@ -1,7 +1,6 @@
 {
   "version": 2,
   "builds": [
-<<<<<<< HEAD
     { "src": "api/index.js", "use": "@vercel/node" },
     { "src": "client/dist/**", "use": "@vercel/static" }
   ],
@@ -14,14 +13,6 @@
     {
       "src": "/(.*)",
       "dest": "client/dist/index.html"
-=======
-    { "src": "*.js", "use": "@vercel/node" },
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/"
->>>>>>> origin/main
     }
   ]
 }
