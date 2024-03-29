@@ -243,7 +243,7 @@ export default function DashAllPosts() {
             </Table.Head>
           </Table>
           <h1 className="my-7 text-center font-semibold text-3xl flex justify-center">
-            You have no posts yet
+            You have no {statusFilter} posts yet
           </h1>
         </>
       )}
